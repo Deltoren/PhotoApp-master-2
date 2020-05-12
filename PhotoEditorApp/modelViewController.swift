@@ -39,7 +39,7 @@ class modelViewController: UIViewController {
             if i == 3 {material.diffuse.contents = UIImage(named: "count3")}
             if i == 4 {material.diffuse.contents = UIImage(named: "count4")}
             if i == 5 {material.diffuse.contents = UIImage(named: "count5")}
-            if i == 6 {material.diffuse.contents = UIImage(named: "count6")}
+            if i == 0 {material.diffuse.contents = UIImage(named: "count6")}
             materials.append(material)
         }
         for i in 0..<geometries.count {
