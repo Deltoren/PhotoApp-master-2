@@ -7,44 +7,57 @@
 //
 
 import UIKit
-import ARKit
 import SceneKit
 
-class modelViewController: UIViewController, ARSCNViewDelegate {
+class modelViewController: UIViewController {
     
+    @IBOutlet weak var sceneView: SCNView!
     
+    var geometryNode: SCNNode = SCNNode()
     
-    @IBOutlet weak var sceneView: ARSCNView!
+    var currentAngle: Float = 0.0
     
-    let configuration = ARWorldTrackingConfiguration()
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        let config = ARWorldTrackingConfiguration()
-        sceneView.session.run(config)
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        sceneView.session.pause()
-    }
-    func setUpBox() {
-        let box = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
-        let colours = [UIColor.purple, .blue, .red, .green, .orange, .yellow]
-        let boxMaterials = colours.map({ (colour) -> SCNMaterial in
+        let scene = SCNScene()
+        sceneView.scene = scene
+        
+        let cameraNode = SCNNode()
+        cameraNode.camera = SCNCamera()
+        scene.rootNode.addChildNode(cameraNode)
+        cameraNode.position = SCNVector3(0, 0, 15)
+        sceneView.allowsCameraControl = true
+        sceneView.autoenablesDefaultLighting = true
+        var geometries = [
+            SCNBox(width: 4.0, height: 4.0, length: 4.0, chamferRadius: 0.3),
+        ]
+        var materials = [SCNMaterial]()
+        for i in 0...7 {
             let material = SCNMaterial()
-            material.diffuse.contents = colour
-            return material
-        })
-        box.materials = boxMaterials
-        let boxNode = SCNNode(geometry: box)
-        let rotateOnce = SCNAction.rotateBy(x: 0, y: 2*CGFloat.pi, z: 0, duration: 3)
-        let rotateForever = SCNAction.repeatForever(rotateOnce)
-        boxNode.position = SCNVector3(0, 0, -0.5)
-        boxNode.runAction(rotateForever)
-        sceneView.scene.rootNode.addChildNode(boxNode)
+            if i == 1 {material.diffuse.contents = UIImage(named: "count1")}
+            if i == 2 {material.diffuse.contents = UIImage(named: "count2")}
+            if i == 3 {material.diffuse.contents = UIImage(named: "count3")}
+            if i == 4 {material.diffuse.contents = UIImage(named: "count4")}
+            if i == 5 {material.diffuse.contents = UIImage(named: "count5")}
+            if i == 6 {material.diffuse.contents = UIImage(named: "count6")}
+            materials.append(material)
+        }
+        for i in 0..<geometries.count {
+            let geometry = geometries[i]
+            let node = SCNNode(geometry: geometry)
+            node.geometry?.materials = materials
+            node.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 2, y: 2, z: 1, duration: 5)))
+            node.runAction(SCNAction.repeatForever(SCNAction.rotateBy(x: 1, y: 2, z: 0, duration: 15)))
+            scene.rootNode.addChildNode(node)
+        }
+    }
+    func panGesture(sender: UIPanGestureRecognizer) {
+        let translation = sender.translation(in: sender.view!)
+        var newAngle = (Float)(translation.x)*(Float)(M_PI)/180.0
+        newAngle += currentAngle
+        geometryNode.transform = SCNMatrix4MakeRotation(newAngle, 0, 1, 0)
+        if (sender.state == UIGestureRecognizer.State.ended) {
+            currentAngle = newAngle
+        }
     }
 }
