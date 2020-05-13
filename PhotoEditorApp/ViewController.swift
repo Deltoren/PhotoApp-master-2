@@ -14,7 +14,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBOutlet weak var seg: UIButton!
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         seg.isEnabled = false;

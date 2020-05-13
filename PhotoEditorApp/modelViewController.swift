@@ -32,7 +32,7 @@ class modelViewController: UIViewController {
             SCNBox(width: 4.0, height: 4.0, length: 4.0, chamferRadius: 0.3),
         ]
         var materials = [SCNMaterial]()
-        for i in 0...7 {
+        for i in 0...6 {
             let material = SCNMaterial()
             if i == 1 {material.diffuse.contents = UIImage(named: "count1")}
             if i == 2 {material.diffuse.contents = UIImage(named: "count2")}

@@ -15,37 +15,34 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
     
     var newImage: UIImage!
     
-    @IBOutlet weak var userInfo: UIView!
-    
-    @IBOutlet weak var userInfoLabel: UILabel!
-    
-    @IBOutlet weak var userInfoText: UITextField!
+    @IBOutlet weak var filter: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         imageViewSecond.image = newImage
         view.setGradientBackground(colorOne: UIColor(red: 45.0/255.0, green: 0.0/255.0, blue: 95.0/255.0, alpha: 1.0), colorTwo: UIColor(red: 75.0/255.0, green: 40.0/255.0, blue: 85.0/255.0, alpha: 1.0))
-        userInfo.isHidden = true
         
+        // TableView
+        setupGesture()
     }
     
-    @IBAction func turnButton(_ sender: UIButton) {
-        userInfo.isHidden = false
-        userInfoLabel.text = "Введите нужный градус"
+    // TableView
+    private func setupGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        tapGesture.numberOfTapsRequired = 1
+        filter.addGestureRecognizer(tapGesture)
     }
     
-    
-    
-    // дальше инструкции для всех кнопок
-    
-    @IBAction func okButton(_ sender: UIButton) {
-        if userInfoText.text != "" {
-            let angle = userInfoText.text
-            var corner: CGFloat = CGFloat((angle as! NSString).doubleValue)
-            corner *= .pi / 180
-            imageViewSecond.image = imageViewSecond.image?.rotate(radians: Float(corner))
-            userInfo.isHidden = true
-        }
+    @objc
+    private func tapped() {
+        guard let tableVC = storyboard?.instantiateViewController(withIdentifier: "tableVC") else {return}
+        tableVC.modalPresentationStyle = .popover
+        let tableOverVC = tableVC.popoverPresentationController
+        tableOverVC?.delegate = self
+        tableOverVC?.sourceView = self.filter
+        tableOverVC?.sourceRect = CGRect(x: self.filter.bounds.midX, y:self.filter.bounds.minY, width: 0, height: 0)
+        tableVC.preferredContentSize = CGSize(width: 250, height: 61)
+        self.present(tableVC, animated: true)
     }
 }
 
@@ -62,5 +59,13 @@ extension UIImage {
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return newImage
+    }
+}
+
+
+// TableView
+extension PhotoEditorController: UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
     }
 }
