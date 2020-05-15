@@ -26,6 +26,19 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
         setupGesture()
     }
     
+    
+    @IBAction func backToStartPage(_ sender: UIButton) {
+        if ((self.presentingViewController) != nil){
+            self.dismiss(animated: false, completion: nil)
+        }
+    }
+    
+    
+    @IBAction func savePhoto(_ sender: UIButton) {
+        UIImageWriteToSavedPhotosAlbum(imageViewSecond.image!, nil, nil, nil)
+    }
+    
+    
     // TableView
     private func setupGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapped))
@@ -41,24 +54,8 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
         tableOverVC?.delegate = self
         tableOverVC?.sourceView = self.filter
         tableOverVC?.sourceRect = CGRect(x: self.filter.bounds.midX, y:self.filter.bounds.minY, width: 0, height: 0)
-        tableVC.preferredContentSize = CGSize(width: 250, height: 61)
+        tableVC.preferredContentSize = CGSize(width: 250, height: 100)
         self.present(tableVC, animated: true)
-    }
-}
-
-extension UIImage {
-    func rotate(radians: Float) -> UIImage? {
-        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
-        newSize.width = floor(newSize.width)
-        newSize.height = floor(newSize.height)
-        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
-        let context = UIGraphicsGetCurrentContext()!
-        context.translateBy(x: newSize.width/2, y: newSize.height/2)
-        context.rotate(by: CGFloat(radians))
-        self.draw(in: CGRect(x: -self.size.width/2, y: -self.size.height/2, width: self.size.width, height: self.size.height))
-        let newImage = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return newImage
     }
 }
 

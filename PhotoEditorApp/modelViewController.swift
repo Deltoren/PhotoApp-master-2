@@ -60,4 +60,10 @@ class modelViewController: UIViewController {
             currentAngle = newAngle
         }
     }
+    
+    @IBAction func backButton(_ sender: UIButton) {
+        if ((self.presentingViewController) != nil){
+            self.dismiss(animated: false, completion: nil)
+        }
+    }
 }

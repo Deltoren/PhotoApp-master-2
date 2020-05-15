@@ -43,7 +43,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                         completion: nil)
                     })
                     alertController.addAction(photoLibraryAction)
-                }
+        }
+        alertController.popoverPresentationController?.sourceView = self.view
+        alertController.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection()
+        alertController.popoverPresentationController?.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
         present(alertController, animated: true, completion: nil)
     }
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]){
