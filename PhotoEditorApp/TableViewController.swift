@@ -7,40 +7,61 @@
 //
 
 import UIKit
+import CoreImage
 
 class TableViewController: UITableViewController {
+    
+    var inputImage: UIImage!
+    
+    let array = ["Sepia",
+                 "Black&White",
+                 "Someone"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        tableView.isScrollEnabled = false
     }
-
-    // MARK: - Table view data source
+    override func viewWillLayoutSubviews() {
+        preferredContentSize = CGSize(width: 250, height: tableView.contentSize.height)
+    }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return array.count
     }
 
-    /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        let textData = array[indexPath.row]
+        cell.textLabel?.text = textData
 
         return cell
     }
-    */
+    
+    func convert(cmage:CIImage) -> UIImage
+    {
+        let context:CIContext = CIContext.init(options: nil)
+        let cgImage:CGImage = context.createCGImage(cmage, from: cmage.extent)!
+        let image:UIImage = UIImage.init(cgImage: cgImage)
+        return image
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
+        if array[indexPath.row] == "Sepia" {
+            let cgimg = (inputImage?.ciImage)
+            let gimage = cgimg?.applyingFilter("CISepiaTone")
+            let finimage : UIImage? = convert(cmage: gimage!)
+            dest.imageViewSecond.image = finimage
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
+}
 
     /*
     // Override to support conditional editing of the table view.

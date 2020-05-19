@@ -39,6 +39,17 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
     }
     
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toTableView" {
+            let dvc = segue.destination as! TableViewController
+            dvc.inputImage = imageViewSecond.image!
+        }
+        if segue.identifier == "toRotateView" {
+            let dvc = segue.destination as! RotateViewController
+            dvc.inputImage = imageViewSecond.image!
+        }
+    }
+    
     // TableView
     private func setupGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tapped))
