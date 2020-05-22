@@ -15,6 +15,7 @@ public struct RGBAPixel {
 class RotateViewController: UIViewController {
     
     var inputImage: UIImage!
+    var degree = 0
     
     /*func toPixel(image: UIImage) -> [RGBAPixel] {
         let width = Int(image.size.width)
@@ -31,29 +32,18 @@ class RotateViewController: UIViewController {
         return pixelValues
     }*/
     
-    func toPixel(image: UIImage) -> UnsafePointer<UInt8> {
-        let imageRef = image.cgImage
-        let pixelData = imageRef?.dataProvider?.data
-        let data : UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
-        return data
+    func toPixel(image: UIImage) -> UnsafeMutableBufferPointer<UInt32> {
+        let cgImage = image.cgImage
+        let imageData = cgImage?.dataProvider?.data as Data?
+        let size = Int(image.size.width) * Int(image.size.height)
+        let buffer = UnsafeMutableBufferPointer<UInt32>.allocate(capacity: size)
+        imageData?.copyBytes(to: buffer)
+        return buffer
     }
-    
-    func toImage(data: UnsafePointer<UInt8>, width: Int, height: Int) -> UIImage {
-        let im = UIImage()
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitsPerComponent = 8
-        let bytesPerPixel = 1
-        let bitsPerPixel = bytesPerPixel * bitsPerComponent
-        let bytesPerRow = bytesPerPixel * width
-        let totalBytes = height * bytesPerRow
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue)
-        guard let providerRef = CGDataProvider(data: Data(bytes: data, count: totalBytes) as CFData) else {
-            return im
-        }
-        guard let imageRef = CGImage(width: width, height: height, bitsPerComponent: bitsPerComponent, bitsPerPixel: bitsPerPixel, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo, provider: providerRef, decode: nil, shouldInterpolate: false, intent: CGColorRenderingIntent.defaultIntent) else {
-            return im
-        }
-        return UIImage.init(cgImage: imageRef)
+
+    func toImage(data: UnsafeMutableBufferPointer<UInt32>, width: Int, height: Int) -> UIImage {
+        let ctx = CGContext(data: data.baseAddress, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        return UIImage(cgImage: ctx.makeImage()!)
     }
     
     @IBOutlet weak var degreeDisplay: UILabel!
@@ -68,47 +58,50 @@ class RotateViewController: UIViewController {
         }
     }
     
-    @IBAction func rotate(_ sender: UISlider) {
-        degreeDisplay.text = String(Int(sender.value))
-        let degree = sender.value
-        let pixelValues = toPixel(image: inputImage)
+    
+    @IBAction func rotateDisplay(_ sender: UISlider) {
+        degree = Int(sender.value)
+        degreeDisplay.text = String(degree)
+    }
+    
+    @IBAction func rotate(_ sender: UIButton) {
         let width = Int(inputImage.size.width)
         let height = Int(inputImage.size.height)
-        var rad = Double(degree) * .pi / 180.0
-        var cosf = cos(rad)
-        var sinf = sin(rad)
+        let rad = Double(degree) * .pi / 180.0
+        let cosf = cos(rad)
+        let sinf = sin(rad)
         
-        var pixelArray = Array(UnsafeBufferPointer(start: pixelValues, count: width * height))
+        let pixelArray = toPixel(image: inputImage)
         
-        var x1 = Int(-Double(height) * sinf)
-        var y1 = Int(Double(height) * cosf)
-        var x2 = Int(Double(width) * cosf - Double(height) * sinf)
-        var y2 = Int(Double(height) * cosf + Double(width) * sinf)
-        var x3 = Int(Double(width) * cosf)
-        var y3 = Int(Double(width) * sinf)
+        let x1 = Int(-Double(height) * sinf)
+        let y1 = Int(Double(height) * cosf)
+        let x2 = Int(Double(width) * cosf - Double(height) * sinf)
+        let y2 = Int(Double(height) * cosf + Double(width) * sinf)
+        let x3 = Int(Double(width) * cosf)
+        let y3 = Int(Double(width) * sinf)
         
-        var minX = min(0, min(x1, min(x2, x3)))
-        var minY = min(0, min(y1, min(y2, y3)))
-        var maxX = max(0, max(x1, max(x2, x3)))
-        var maxY = max(0, max(y1, max(y2, y3)))
+        let minX = min(0, min(x1, min(x2, x3)))
+        let minY = min(0, min(y1, min(y2, y3)))
+        let maxX = max(0, max(x1, max(x2, x3)))
+        let maxY = max(0, max(y1, max(y2, y3)))
         
-        var w = maxX - minX
-        var h = maxY - minY
+        let w = maxX - minX
+        let h = maxY - minY
         
-        var newPixelArray = pixelArray
+        var newPixelArray = UnsafeMutableBufferPointer<UInt32>.allocate(capacity: w * h * 4)
         
         for y in 0 ..< h {
             for x in 0 ..< w {
-                var sourceX = Int(Double(x + minX) * cosf + Double(y + minY) * sinf)
-                var sourceY = Int(Double(y + minY) * cosf - Double(x + minX) * sinf)
+                let sourceX = Int(Double(x + minX) * cosf + Double(y + minY) * sinf)
+                let sourceY = Int(Double(y + minY) * cosf - Double(x + minX) * sinf)
                 if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
-                    newPixelArray[y * width + x] = pixelArray[sourceY * width + sourceX]
+                    newPixelArray[y * w + x] = pixelArray[sourceY * width + sourceX]
                 } else {
-                    newPixelArray[y * width + x] = 0
+                    newPixelArray[y * w + x] = 0
                 }
             }
         }
-        let newImage: UIImage = toImage(data: UnsafePointer<UInt8>(newPixelArray), width: width, height: height)
+        let newImage: UIImage = toImage(data: newPixelArray, width: w, height: h)
         let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
         dest.imageViewSecond.image = newImage
     }

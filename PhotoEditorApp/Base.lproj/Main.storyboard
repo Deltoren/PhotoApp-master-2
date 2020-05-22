@@ -251,20 +251,33 @@
                                 <rect key="frame" x="20" y="733" width="374" height="61"/>
                                 <subviews>
                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="359" translatesAutoresizingMaskIntoConstraints="NO" id="Kea-94-ANC">
-                                        <rect key="frame" x="6" y="16" width="362" height="30"/>
+                                        <rect key="frame" x="13" y="15" width="293" height="32"/>
                                         <color key="minimumTrackTintColor" red="0.3764019012" green="0.87136638160000002" blue="0.88421255350000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <color key="maximumTrackTintColor" red="0.13723745940000001" green="0.052849031980000002" blue="0.1970862746" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <connections>
-                                            <action selector="rotate:" destination="ZWN-II-J4T" eventType="valueChanged" id="XV9-Wn-tQt"/>
+                                            <action selector="rotateDisplay:" destination="ZWN-II-J4T" eventType="valueChanged" id="tSy-Qn-ddX"/>
                                         </connections>
                                     </slider>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mni-hW-T91">
+                                        <rect key="frame" x="324" y="15" width="30" height="31"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <state key="normal" title="OK">
+                                            <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="rotate:" destination="ZWN-II-J4T" eventType="touchUpInside" id="vOt-y2-afc"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" red="0.68627450980000004" green="0.32156862749999998" blue="0.87058823529999996" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstItem="Kea-94-ANC" firstAttribute="top" secondItem="s0V-wS-aNS" secondAttribute="top" constant="16" id="U4A-eM-VGE"/>
-                                    <constraint firstItem="Kea-94-ANC" firstAttribute="leading" secondItem="s0V-wS-aNS" secondAttribute="leadingMargin" id="igw-JN-nYK"/>
-                                    <constraint firstItem="Kea-94-ANC" firstAttribute="centerY" secondItem="s0V-wS-aNS" secondAttribute="centerY" id="tSg-M4-3IU"/>
-                                    <constraint firstItem="Kea-94-ANC" firstAttribute="trailing" secondItem="s0V-wS-aNS" secondAttribute="trailingMargin" id="thS-Y1-GXg"/>
+                                    <constraint firstAttribute="bottom" secondItem="Kea-94-ANC" secondAttribute="bottom" constant="15" id="3Oq-qX-COK"/>
+                                    <constraint firstItem="mni-hW-T91" firstAttribute="top" secondItem="s0V-wS-aNS" secondAttribute="top" constant="15" id="9cQ-zZ-RQL"/>
+                                    <constraint firstItem="mni-hW-T91" firstAttribute="leading" secondItem="Kea-94-ANC" secondAttribute="trailing" constant="20" id="FmQ-k0-OX6"/>
+                                    <constraint firstAttribute="trailing" secondItem="mni-hW-T91" secondAttribute="trailing" constant="20" id="JqL-rA-Tg1"/>
+                                    <constraint firstItem="Kea-94-ANC" firstAttribute="leading" secondItem="s0V-wS-aNS" secondAttribute="leading" constant="15" id="KGd-ba-Tl7"/>
+                                    <constraint firstAttribute="bottom" secondItem="mni-hW-T91" secondAttribute="bottom" constant="15" id="Leb-uQ-Uea"/>
+                                    <constraint firstItem="Kea-94-ANC" firstAttribute="top" secondItem="s0V-wS-aNS" secondAttribute="top" constant="15" id="aAZ-et-vcM"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
