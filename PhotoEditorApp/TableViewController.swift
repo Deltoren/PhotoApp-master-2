@@ -44,21 +44,14 @@ class TableViewController: UITableViewController {
         return cell
     }
     
-    func convert(cmage:CIImage) -> UIImage
-    {
-        let context:CIContext = CIContext.init(options: nil)
-        let cgImage:CGImage = context.createCGImage(cmage, from: cmage.extent)!
-        let image:UIImage = UIImage.init(cgImage: cgImage)
-        return image
-    }
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
         if array[indexPath.row] == "Sepia" {
             let cgimg = (inputImage?.ciImage)
             let gimage = cgimg?.applyingFilter("CISepiaTone")
-            let finimage : UIImage? = convert(cmage: gimage!)
-            dest.imageViewSecond.image = finimage
+            dest.newImage = UIImage(ciImage: gimage!)
+            dest.inputImage = inputImage
+            self.present(dest, animated: true, completion: nil)
         }
         tableView.deselectRow(at: indexPath, animated: true)
 }

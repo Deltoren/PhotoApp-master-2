@@ -8,23 +8,34 @@
 
 import UIKit
 
-class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIScrollViewDelegate {
     
+    @IBOutlet weak var scrollView: UIScrollView!
     
     @IBOutlet weak var imageViewSecond: UIImageView!
     
     var newImage: UIImage!
     
+    var inputImage: UIImage!
+    
     @IBOutlet weak var filter: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        scrollView.frame = view.frame
+        scrollView.minimumZoomScale = 1
+        scrollView.maximumZoomScale = 4
+        scrollView.bounces = true
+        scrollView.delegate = self
         imageViewSecond.image = newImage
         view.setGradientBackground(colorOne: UIColor(red: 45.0/255.0, green: 0.0/255.0, blue: 95.0/255.0, alpha: 1.0), colorTwo: UIColor(red: 75.0/255.0, green: 40.0/255.0, blue: 85.0/255.0, alpha: 1.0))
         // TableView
         setupGesture()
     }
     
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imageViewSecond
+    }
     
     @IBAction func backToStartPage(_ sender: UIButton) {
         if ((self.presentingViewController) != nil){
@@ -39,13 +50,15 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
     
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "toTableView" {
-            let dvc = segue.destination as! TableViewController
-            dvc.inputImage = imageViewSecond.image!
-        }
         if segue.identifier == "toRotateView" {
             let dvc = segue.destination as! RotateViewController
-            dvc.inputImage = imageViewSecond.image!
+            dvc.inputImage = inputImage!
+            dvc.typeAlg = "degree"
+        }
+        if segue.identifier == "toZoomView" {
+            let dvc = segue.destination as! RotateViewController
+            dvc.inputImage = inputImage!
+            dvc.typeAlg = "zoom"
         }
     }
     
@@ -58,13 +71,14 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
     
     @objc
     private func tapped() {
-        guard let tableVC = storyboard?.instantiateViewController(withIdentifier: "tableVC") else {return}
+        let tableVC = storyboard?.instantiateViewController(withIdentifier: "tableVC") as! TableViewController
         tableVC.modalPresentationStyle = .popover
         let tableOverVC = tableVC.popoverPresentationController
         tableOverVC?.delegate = self
         tableOverVC?.sourceView = self.filter
         tableOverVC?.sourceRect = CGRect(x: self.filter.bounds.midX, y:self.filter.bounds.minY, width: 0, height: 0)
         tableVC.preferredContentSize = CGSize(width: 250, height: 100)
+        tableVC.inputImage = newImage
         self.present(tableVC, animated: true)
     }
 }

@@ -9,7 +9,7 @@
 import UIKit
 import SceneKit
 
-class modelViewController: UIViewController {
+class ModelViewController: UIViewController {
     
     @IBOutlet weak var sceneView: SCNView!
     

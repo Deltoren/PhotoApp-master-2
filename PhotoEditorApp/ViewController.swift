@@ -61,6 +61,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         if segue.identifier == "toEditorPage" {
             let dvc = segue.destination as! PhotoEditorController
             dvc.newImage = imageView.image!
+            dvc.inputImage = imageView.image!
         }
     }
 }

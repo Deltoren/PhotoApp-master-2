@@ -8,14 +8,12 @@
 
 import UIKit
 
-public struct RGBAPixel {
-    public var raw: UInt32
-}
-
 class RotateViewController: UIViewController {
     
+    var typeAlg: String!
     var inputImage: UIImage!
-    var degree = 0
+    var degree: Int = 0
+    var zoom: Double = 0.0
     
     /*func toPixel(image: UIImage) -> [RGBAPixel] {
         let width = Int(image.size.width)
@@ -50,6 +48,7 @@ class RotateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.setGradientBackground(colorOne: UIColor(red: 45.0/255.0, green: 0.0/255.0, blue: 95.0/255.0, alpha: 1.0), colorTwo: UIColor(red: 75.0/255.0, green: 40.0/255.0, blue: 85.0/255.0, alpha: 1.0))
     }
     
     @IBAction func backButton(_ sender: UIButton) {
@@ -60,50 +59,89 @@ class RotateViewController: UIViewController {
     
     
     @IBAction func rotateDisplay(_ sender: UISlider) {
-        degree = Int(sender.value)
-        degreeDisplay.text = String(degree)
+        if typeAlg == "degree" {
+            sender.minimumValue = 0
+            sender.maximumValue = 359
+            degree = Int(sender.value)
+            degreeDisplay.text = String(degree)
+        }
+        else if typeAlg == "zoom" {
+            sender.minimumValue = 0.1
+            sender.maximumValue = 10
+            zoom = Double(sender.value)
+            degreeDisplay.text = String(zoom)
+        }
     }
     
     @IBAction func rotate(_ sender: UIButton) {
-        let width = Int(inputImage.size.width)
-        let height = Int(inputImage.size.height)
-        let rad = Double(degree) * .pi / 180.0
-        let cosf = cos(rad)
-        let sinf = sin(rad)
-        
-        let pixelArray = toPixel(image: inputImage)
-        
-        let x1 = Int(-Double(height) * sinf)
-        let y1 = Int(Double(height) * cosf)
-        let x2 = Int(Double(width) * cosf - Double(height) * sinf)
-        let y2 = Int(Double(height) * cosf + Double(width) * sinf)
-        let x3 = Int(Double(width) * cosf)
-        let y3 = Int(Double(width) * sinf)
-        
-        let minX = min(0, min(x1, min(x2, x3)))
-        let minY = min(0, min(y1, min(y2, y3)))
-        let maxX = max(0, max(x1, max(x2, x3)))
-        let maxY = max(0, max(y1, max(y2, y3)))
-        
-        let w = maxX - minX
-        let h = maxY - minY
-        
-        var newPixelArray = UnsafeMutableBufferPointer<UInt32>.allocate(capacity: w * h * 4)
-        
-        for y in 0 ..< h {
-            for x in 0 ..< w {
-                let sourceX = Int(Double(x + minX) * cosf + Double(y + minY) * sinf)
-                let sourceY = Int(Double(y + minY) * cosf - Double(x + minX) * sinf)
-                if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
-                    newPixelArray[y * w + x] = pixelArray[sourceY * width + sourceX]
-                } else {
-                    newPixelArray[y * w + x] = 0
+        if typeAlg == "degree" {
+            let width = Int(inputImage.size.width)
+            let height = Int(inputImage.size.height)
+            let rad = Double(degree) * .pi / 180.0
+            let cosf = cos(rad)
+            let sinf = sin(rad)
+            
+            let pixelArray = toPixel(image: inputImage)
+            
+            let x1 = Int(-Double(height) * sinf)
+            let y1 = Int(Double(height) * cosf)
+            let x2 = Int(Double(width) * cosf - Double(height) * sinf)
+            let y2 = Int(Double(height) * cosf + Double(width) * sinf)
+            let x3 = Int(Double(width) * cosf)
+            let y3 = Int(Double(width) * sinf)
+            
+            let minX = min(0, min(x1, min(x2, x3)))
+            let minY = min(0, min(y1, min(y2, y3)))
+            let maxX = max(0, max(x1, max(x2, x3)))
+            let maxY = max(0, max(y1, max(y2, y3)))
+            
+            let w = maxX - minX
+            let h = maxY - minY
+            
+            var newPixelArray = UnsafeMutableBufferPointer<UInt32>.allocate(capacity: w * h * 4)
+            
+            for y in 0 ..< h {
+                for x in 0 ..< w {
+                    let sourceX = Int(Double(x + minX) * cosf + Double(y + minY) * sinf)
+                    let sourceY = Int(Double(y + minY) * cosf - Double(x + minX) * sinf)
+                    if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                        newPixelArray[y * w + x] = pixelArray[sourceY * width + sourceX]
+                    } else {
+                        newPixelArray[y * w + x] = 0
+                    }
                 }
             }
+            let newImage: UIImage = toImage(data: newPixelArray, width: w, height: h)
+            let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
+            dest.newImage = newImage
+            dest.inputImage = inputImage
+            self.present(dest, animated: true, completion: nil)
+        } else if typeAlg == "zoom" {
+            let width = Int(inputImage.size.width)
+            let height = Int(inputImage.size.height)
+            let pixelArray = toPixel(image: inputImage)
+            
+            let w = Int(Double(width) * zoom)
+            let h = Int(Double(height) * zoom)
+            var newPixelArray = UnsafeMutableBufferPointer<UInt32>.allocate(capacity: w * h * 4)
+            
+            for y in 0 ..< h {
+                for x in 0 ..< w {
+                    let sourceX = Int(1 / zoom * Double(x))
+                    let sourceY = Int(1 / zoom * Double(y))
+                    if (sourceX >= 0 && sourceX < width && sourceY >= 0 && sourceY < height) {
+                        newPixelArray[y * w + x] = pixelArray[sourceY * width + sourceX]
+                    } else {
+                        newPixelArray[y * w + x] = 0
+                    }
+                }
+            }
+            let newImage: UIImage = toImage(data: newPixelArray, width: w, height: h)
+            let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
+            dest.newImage = newImage
+            dest.inputImage = inputImage
+            self.present(dest, animated: true, completion: nil)
         }
-        let newImage: UIImage = toImage(data: newPixelArray, width: w, height: h)
-        let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
-        dest.imageViewSecond.image = newImage
     }
     
     /*@IBAction func rotate(_ sender: UISlider) {
