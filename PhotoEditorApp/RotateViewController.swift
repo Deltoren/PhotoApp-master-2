@@ -18,21 +18,6 @@ class RotateViewController: UIViewController {
     var angle: Int!
     var original: UIImage!
     
-    /*func toPixel(image: UIImage) -> [RGBAPixel] {
-        let width = Int(image.size.width)
-        let height = Int(image.size.height)
-        let bitsPerComponent = 4
-        let bytesPerRow = 4 * width
-        let totalBytes = height * bytesPerRow
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let mutablePointer = UnsafeMutablePointer<RGBAPixel>.allocate(capacity: width * height)
-        let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
-        let context = CGContext(data: mutablePointer, width: width, height: height, bitsPerComponent: bitsPerComponent, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo)
-        let bufferPointer = UnsafeBufferPointer<RGBAPixel>(start: mutablePointer, count: totalBytes)
-        let pixelValues = Array<RGBAPixel>(bufferPointer)
-        return pixelValues
-    }*/
-    
     func toPixel(image: UIImage) -> UnsafeMutableBufferPointer<UInt32> {
         let cgImage = image.cgImage
         let imageData = cgImage?.dataProvider?.data as Data?
@@ -154,30 +139,4 @@ class RotateViewController: UIViewController {
             self.present(dest, animated: true, completion: nil)
         }
     }
-    
-    /*@IBAction func rotate(_ sender: UISlider) {
-        degreeDisplay.text = String(Int(sender.value))
-        var degree = sender.value
-        var pixelValues = toPixel(image: inputImage)
-        var width = Int(inputImage.size.width)
-        var height = Int(inputImage.size.height)
-        var sin = Double(1)
-        var cos = Double(0)
-        var x0 = 0.5 * Double(width - 1)
-        var y0 = 0.5 * Double(height - 1)
-        var newPixelValues = Array<RGBAPixel>(repeating: 0, count: width * height)
-        for x in 0 ..< width {
-            for y in 0 ..< height {
-                var a = Double(x) - x0
-                var b = Double(y) - y0
-                var xx = Int(a * cos - b * sin + x0)
-                var yy = Int(a * sin + b * cos + y0)
-                if xx >= 0 && xx < width && yy >= 0 && yy < height {
-                    newPixelValues[x * width + y] = pixelValues[xx * width + yy]
-                }
-            }
-        }
-        
-    }*/
-    
 }
