@@ -141,8 +141,6 @@ class TableViewController: UITableViewController {
                 let b = CGFloat(Int(hexNumber) & 0xFF)
                 let a = CGFloat(1.0)
                
-                let color = UIColor(red: r, green: g, blue: b, alpha: a)
-               
                 if mode == "monochrome" {
                     let avg = 0.3 * r + 0.59 * g + 0.11 * b
                     let newHexCode = UInt32(255.0) << 24 | UInt32(avg) << 16 | UInt32(avg) << 8 | UInt32(avg)
@@ -168,19 +166,16 @@ class TableViewController: UITableViewController {
                 }
                 
                 if mode == "red" {
-                    let avg = 0.3 * r + 0.59 * g + 0.11 * b
                     let newHexCode = UInt32(255.0) << 24 | UInt32(r) << 16 | UInt32(g) << 8 | UInt32(255.0)
                     pixelArray[pixelInfo] = newHexCode
                 }
                 
                 if mode == "green" {
-                    let avg = 0.3 * r + 0.59 * g + 0.11 * b
                     let newHexCode = UInt32(255.0) << 24 | UInt32(r) << 16 | UInt32(255.0) << 8 | UInt32(b)
                     pixelArray[pixelInfo] = newHexCode
                 }
                 
                 if mode == "blue" {
-                    let avg = 0.3 * r + 0.59 * g + 0.11 * b
                     let newHexCode = UInt32(255.0) << 24 | UInt32(255.0) << 16 | UInt32(g) << 8 | UInt32(b)
                     pixelArray[pixelInfo] = newHexCode
                 }
