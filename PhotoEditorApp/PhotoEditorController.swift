@@ -14,9 +14,13 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
     
     @IBOutlet weak var imageViewSecond: UIImageView!
     
+    var angle = 0
+    
     var newImage: UIImage!
     
     var inputImage: UIImage!
+    
+    var originalImage: UIImage!
     
     @IBOutlet weak var filter: UIButton!
     
@@ -52,13 +56,18 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toRotateView" {
             let dvc = segue.destination as! RotateViewController
-            dvc.inputImage = inputImage!
+            dvc.inputImage = inputImage
             dvc.typeAlg = "degree"
+            dvc.angle = angle
+            dvc.original = originalImage
         }
         if segue.identifier == "toZoomView" {
             let dvc = segue.destination as! RotateViewController
-            dvc.inputImage = inputImage!
+            dvc.inputImage = inputImage
             dvc.typeAlg = "zoom"
+            dvc.nImage = newImage
+            dvc.degree = angle
+            dvc.original = originalImage
         }
     }
     
@@ -78,7 +87,10 @@ class PhotoEditorController: UIViewController, UIImagePickerControllerDelegate, 
         tableOverVC?.sourceView = self.filter
         tableOverVC?.sourceRect = CGRect(x: self.filter.bounds.midX, y:self.filter.bounds.minY, width: 0, height: 0)
         tableVC.preferredContentSize = CGSize(width: 250, height: 100)
-        tableVC.inputImage = newImage
+        tableVC.inputImage = inputImage
+        tableVC.nImage = newImage
+        tableVC.degree = angle
+        tableVC.original = originalImage
         self.present(tableVC, animated: true)
     }
 }

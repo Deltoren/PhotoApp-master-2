@@ -62,6 +62,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             let dvc = segue.destination as! PhotoEditorController
             dvc.newImage = imageView.image!
             dvc.inputImage = imageView.image!
+            dvc.originalImage = imageView.image!
         }
     }
 }

@@ -12,8 +12,11 @@ class RotateViewController: UIViewController {
     
     var typeAlg: String!
     var inputImage: UIImage!
+    var nImage: UIImage!
     var degree: Int = 0
     var zoom: Double = 0.0
+    var angle: Int!
+    var original: UIImage!
     
     /*func toPixel(image: UIImage) -> [RGBAPixel] {
         let width = Int(image.size.width)
@@ -48,7 +51,6 @@ class RotateViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.setGradientBackground(colorOne: UIColor(red: 45.0/255.0, green: 0.0/255.0, blue: 95.0/255.0, alpha: 1.0), colorTwo: UIColor(red: 75.0/255.0, green: 40.0/255.0, blue: 85.0/255.0, alpha: 1.0))
     }
     
     @IBAction func backButton(_ sender: UIButton) {
@@ -75,6 +77,10 @@ class RotateViewController: UIViewController {
     
     @IBAction func rotate(_ sender: UIButton) {
         if typeAlg == "degree" {
+            degree += angle
+            if degree > 360 {
+                degree -= 360
+            }
             let width = Int(inputImage.size.width)
             let height = Int(inputImage.size.height)
             let rad = Double(degree) * .pi / 180.0
@@ -115,11 +121,14 @@ class RotateViewController: UIViewController {
             let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
             dest.newImage = newImage
             dest.inputImage = inputImage
+            dest.angle = degree
+            dest.originalImage = original
             self.present(dest, animated: true, completion: nil)
-        } else if typeAlg == "zoom" {
-            let width = Int(inputImage.size.width)
-            let height = Int(inputImage.size.height)
-            let pixelArray = toPixel(image: inputImage)
+        }
+        else if typeAlg == "zoom" {
+            let width = Int(nImage.size.width)
+            let height = Int(nImage.size.height)
+            let pixelArray = toPixel(image: nImage)
             
             let w = Int(Double(width) * zoom)
             let h = Int(Double(height) * zoom)
@@ -140,6 +149,8 @@ class RotateViewController: UIViewController {
             let dest = storyboard?.instantiateViewController(withIdentifier: "PhotoEditorController") as! PhotoEditorController
             dest.newImage = newImage
             dest.inputImage = inputImage
+            dest.angle = degree
+            dest.originalImage = original
             self.present(dest, animated: true, completion: nil)
         }
     }
